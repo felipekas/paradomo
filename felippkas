@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WISHLIST</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Fundo em Tela Cheia */
+        .bg-fullscreen {
+            width: 100vw;
+            height: 100vh;
+            background-image: url('https://i.pinimg.com/736x/3a/81/73/3a8173f59a9a2b904ce7acdfedc35b04.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 20px; /* Espaço entre a imagem do topo e os botões */
+        }
+
+        /* ESTILO DA IMAGEM PNG NO TOPO */
+        .img-topo {
+            width: 90vw;
+            max-width: 1000px;
+            height: auto;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Moldura com a foto por trás dos botões */
+        .box-botoes {
+            background-image: url('preview.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            padding: 130px 50px;
+            border-radius: 16px;
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .bg-fullscreen h1 {
+            color: #ffffff;
+            text-align: center;
+            font-size: 2rem;
+            font-family: Arial, sans-serif;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            max-width: 600px;
+        }
+
+        .btn-center {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-center:hover {
+            background-color: #ffffff;
+            color: #000000;
+            transform: scale(1.05);
+        }
+
+        /* ESTILOS DOS MODAIS */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex !important;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 360px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            animation: abrirModal 0.3s ease-out forwards;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        /* GRID */
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        /* CARD INDIVIDUAL DO ITEM */
+        .wish-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 6px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .wish-item:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .wish-item img {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .wish-item span {
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .btn-fechar {
+            margin-top: 16px;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            background-color: #ff5c5c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s ease;
+        }
+
+        .btn-fechar:hover {
+            background-color: #e04343;
+        }
+
+        /* SUB-POPUP (3 LINKS) E MODAL INFOS */
+        #subModalCamisas, #modalInfos {
+            z-index: 1100;
+        }
+
+        .submodal-content {
+            background: #ffffff;
+            padding: 24px 20px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 320px;
+            width: 85%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            font-family: Arial, sans-serif;
+            animation: abrirModal 0.3s ease-out forwards;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .submodal-content h3 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 14px;
+        }
+
+        .submodal-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .submodal-link-btn {
+            display: block;
+            padding: 10px 14px;
+            background-color: #222;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .submodal-link-btn:hover {
+            background-color: #444;
+        }
+
+        @keyframes abrirModal {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA PRINCIPAL -->
+    <div class="bg-fullscreen">
+        <!-- IMAGEM PNG POSICIONADA NO TOPO -->
+        <img src="para_momo_letras.png" alt="Destaque" class="img-topo">
+
+        <div class="box-botoes">
+            <button type="button" class="btn-center" onclick="abrirWishlist()">Acessar Wishlist</button>
+            <button type="button" class="btn-center" onclick="infos()"> infos </button>
+        </div>
+    </div>
+
+    <!-- JANELA MODAL PRINCIPAL -->
+    <div id="meuModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>☝️</h2>
+            
+            <div class="wishlist-grid">
+                <!-- Item 1 -->
+                <a href="https://br.shp.ee/JyFWBjXb" target="_blank" class="wish-item">
+                    <img src="https://imgs.search.brave.com/DHBTksJHF77rZYWCty-PI2s-O5DEYvrghJ8DHAbWUwc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NTFVV1d1VDdKcUwu/anBn" alt="Chinelo quadrado">
+                    <span>1. Chinelo quadrado</span>
+                </a>
+
+                <!-- Item 2 -->
+                <a href="https://br.shp.ee/HPJXRvqJ" target="_blank" class="wish-item">
+                    <img src="https://imgs.search.brave.com/rLc1Lbwflyo_shghqpPg3OqSn9AxJdHtVbAZxZ-nENA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NTFMMnllUHVjdUwu/anBn" alt="Short">
+                    <span>2. Short</span>
+                </a>
+
+                <!-- Item 3 -->
+                <button type="button" class="wish-item" onclick="abrirSubModal()">
+                    <img src="https://imgs.search.brave.com/0O4F9M3MzICKyfyTB-swt341E65UVw_A66HhHvlaCVU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/YXdzbGkuY29tLmJy/LzYwMHgxMDAwLzI3/MzgvMjczODQ5Ni9w/cm9kdXRvLzI2NTAy/ODY2My92aXRyaW5l/LXNpdGUtbG93LXF1/YWxpdHktenh6ZDlz/a2UxMC5qcGc" alt="Camisas muito massa">
+                    <span>3. Camisas muito massa</span>
+                </button>
+
+                <!-- Item 4 -->
+                <a href="https://br.shp.ee/qNbMjgdd" target="_blank" class="wish-item">
+                    <img src="https://imgs.search.brave.com/LJ_conOoW6IU37sKJRscCdm_7SyKtArMk-rdN11AB_A/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NjFWSE1kNWVuVkwu/anBn" alt="Sérum">
+                    <span>4. Sérum</span>
+                </a>
+
+                <!-- Item 5 -->
+                <a href="https://br.shp.ee/4EBUUML7" target="_blank" class="wish-item">
+                    <img src="https://imgs.search.brave.com/IGnTHHzbFZqtfAFMte-ejhXCsuGdw3pEzc4KAnUtS18/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9odHRw/Mi5tbHN0YXRpYy5j/b20vRF9RX05QXzJY/Xzc4MTY0NS1NTEE5/NjE1Mjk4Mjk2MV8x/MDIwMjUtRS53ZWJw" alt="Lousa para estudos muito massa">
+                    <span>5. Lousa para estudos muito massa</span>
+                </a>
+
+                <!-- Item 6 -->
+                <a href="https://shopee.com.br/oficial/search?keyword=carteira%20masculina" target="_blank" class="wish-item">
+                    <img src="https://i.pinimg.com/236x/4b/d5/e1/4bd5e13e702734ac5cb9c1ff0e1b0940.jpg" alt="Carteira">
+                    <span>6. Carteira</span>
+                </a>
+            </div>
+
+            <button type="button" class="btn-fechar" onclick="fecharWishlist()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- POP-UP DE INFORMAÇÕES -->
+    <div id="modalInfos" class="modal-overlay">
+        <div class="submodal-content">
+            <h3>aqui vou fazer breves comentários sobre o presente</h3>
+            <p style="color: #444; font-size: 0.95rem; margin-bottom: 16px; text-align: left;">
+                <b>1.</b> o chinelo eu acho massa demais, adoraria sair pra lá e pra cá com ele
+                (tamanho 38 ou 39)
+                <br><br>
+                <b>2.</b> the short is very fire!!!!
+                (tamanho M)
+                <br><br>
+                <b>3.</b> aqui eu adoraria as 3 mas você pode pegar só uma, tem uma muito engraçada mas você sabe que é a minha cara kkkkkkk
+                <br>
+                <b>opção 1.</b> Branco, P (pelo que vi ela é grandona mas você dá uma olhada melhor para ter certeza)
+                <br>
+                <b>opção 2.</b> Off-white, M
+                <br>
+                <b>opção 3.</b> Preto, M
+                <br><br>
+                <b>4.</b> despeço apresentações aqui né
+                <br><br>
+                <b>5.</b> aqui eu acho que deve ser um tesão para estudar
+                <br><br>
+                <b>6.</b> qualquer uma que caiba documento (RG, CNH e cartão)
+            </p>
+            <button type="button" class="btn-fechar" onclick="fecharInfos()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- POP-UP COM OS 3 LINKS -->
+    <div id="subModalCamisas" class="modal-overlay">
+        <div class="submodal-content">
+            <h3>Se possivel as 3 rsrs</h3>
+            <div class="submodal-links">
+                <a href="https://br.shp.ee/DceJwhLb" target="_blank" class="submodal-link-btn"> I. achei muito zika </a>
+                <a href="https://br.shp.ee/UMFGdLGV" target="_blank" class="submodal-link-btn"> II. na faculdade ia ser massa </a>
+                <a href="https://shopee.com.br/product/370608548/58203352074?rModelId=238799280041&d_id=eac10" target="_blank" class="submodal-link-btn"> III. achei minha cara </a>
+            </div>
+            <button type="button" class="btn-fechar" onclick="fecharSubModal()">Voltar</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        function abrirWishlist() {
+            document.getElementById('meuModal').classList.add('active');
+        }
+
+        function fecharWishlist() {
+            document.getElementById('meuModal').classList.remove('active');
+        }
+
+        function abrirSubModal() {
+            document.getElementById('subModalCamisas').classList.add('active');
+        }
+
+        function fecharSubModal() {
+            document.getElementById('subModalCamisas').classList.remove('active');
+        }
+
+        function infos() {
+            document.getElementById('modalInfos').classList.add('active');
+        }
+
+        function fecharInfos() {
+            document.getElementById('modalInfos').classList.remove('active');
+        }
+    </script>
+
+</body>
+</html>
